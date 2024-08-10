@@ -3,18 +3,21 @@ import { nanoid } from "@reduxjs/toolkit";
 import * as Yup from "yup";
 import style from "./ContactForm.module.css";
 import { useDispatch } from "react-redux";
-import { addContact } from "../../redux/contactsSlice";
+import { addContactThunk } from "../../redux/contactsOps";
 
 // Функція ContactForm для додавання нового контакту
-
 const ContactForm = () => {
+  //Використовуємо dispatch для відправлення екшену для додавання контакту
   const dispatch = useDispatch();
   const initialValues = { name: "", number: "" };
-  // Функція -обробник відправки форми
+  // Функція -обробник відправки форми для додавання контакту
   const handleSubmit = (values, options) => {
-    // Додаємо новий контакт, генеруємо унікальний id за допомогою nanoid
-    const newItem = { name: values.name, number: values.number, id: nanoid() };
-    dispatch(addContact(newItem));
+    dispatch(
+      addContactThunk({
+        name: values.name,
+        number: values.number,
+      })
+    );
     // Скидаємо форму після відправки
     options.resetForm();
   };

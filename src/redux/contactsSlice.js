@@ -1,24 +1,78 @@
-import { createSlice } from "@reduxjs/toolkit";
-import initialContacts from "../data/contacts.json";
+import { createSlice, createSelector, isAnyOf } from "@reduxjs/toolkit";
+
+import {
+  addContactThunk,
+  deleteContactThunk,
+  fetchContactsThunk,
+} from "./contactsOps";
 
 const initialState = {
-  items: initialContacts,
+  items: [],
+  error: null,
+  loading: false,
 };
 
 const slice = createSlice({
   name: "contacts",
   initialState,
-  reducers: {
-    addContact(state, action) {
-      state.items.push(action.payload);
-    },
-    deleteContact: (state, action) => {
-      state.items = state.items.filter((item) => item.id !== action.payload);
-    },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchContactsThunk.fulfilled, (state, action) => {
+        state.items = action.payload;
+      })
+      .addCase(addContactThunk.fulfilled, (state, action) => {
+        state.items.push(action.payload);
+      })
+      .addCase(deleteContactThunk.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item.id !== action.payload);
+      })
+      .addMatcher(
+        isAnyOf(
+          fetchContactsThunk.pending,
+          addContactThunk.pending,
+          deleteContactThunk.pending
+        ),
+        (state) => {
+          state.loading = true;
+          state.error = false;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContactsThunk.rejected,
+          addContactThunk.rejected,
+          deleteContactThunk.rejected
+        ),
+        (state) => {
+          state.loading = false;
+          state.error = true;
+        }
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContactsThunk.fulfilled,
+          addContactThunk.fulfilled,
+          deleteContactThunk.fulfilled
+        ),
+        (state) => {
+          state.loading = false;
+        }
+      );
   },
 });
-export const { addContact, deleteContact } = slice.actions;
+
 export const selectContacts = (state) => state.contacts.items;
+export const selectIsLoading = (state) => state.contacts.loading;
+export const selectIsError = (state) => state.contacts.error;
+
+export const selectFilteredContacts = createSelector(
+  [selectContacts, (state, filter) => filter], //повертається масив контактів та використовується анонімна функція, яка повертає значення фільтру.
+  (contacts, filter) => {
+    return contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    ); //Ця функція фільтрує контакти, і  тільки ті, які включають filter в своєму імені
+  }
+);
 export const contactReducer = slice.reducer;
 
 export default contactReducer;

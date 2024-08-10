@@ -4,16 +4,11 @@ import { changeFilter, selectNameFilter } from "../../redux/filtersSlice";
 
 //SearchBox функція для створення розмітки компонента
 //value це значення поля вводу, яке відображається у текстовому полі.
-//handleFilterChange це функція-обробник, яка реагує на зміни введені користувачем
-//в поле вводу і передає зміни як payload до екшена changeFilter
-//а потім відправляє їх до Redux store  за допомогою dispatch.
 
 const SearchBox = () => {
-  const dispatch = useDispatch();
-  const filterName = useSelector(selectNameFilter);
-  const handleFilterChange = (event) => {
-    dispatch(changeFilter(event.target.value));
-  };
+  const dispatch = useDispatch(); //Відбувається надсилання екшенів у Redux-стан.
+  const filterName = useSelector(selectNameFilter); //витягується значення фільтра з Redux-стану за допомогою селектора selectNameFilter.
+
   return (
     <div>
       <p className={styles.searchText}>Find contacts by name</p>
@@ -21,7 +16,7 @@ const SearchBox = () => {
         className={styles.inputSearch}
         type="text"
         value={filterName}
-        onChange={handleFilterChange}
+        onChange={(e) => dispatch(changeFilter(e.target.value))} //викликається dispatch з екшеном changeFilter, який оновлює значення фільтра у Redux-стані.
       />
     </div>
   );
