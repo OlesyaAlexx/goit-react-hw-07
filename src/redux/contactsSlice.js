@@ -66,7 +66,7 @@ export const selectIsLoading = (state) => state.contacts.loading;
 export const selectIsError = (state) => state.contacts.error;
 
 export const selectFilteredContacts = createSelector(
-  [selectContacts, (state, filter) => filter], //повертається масив контактів та використовується анонімна функція, яка повертає значення фільтру.
+  [selectContacts, (state) => state.filters.name], //повертається масив контактів та використовується анонімна функція, яка повертає значення фільтру.
   (contacts, filter) => {
     return contacts.filter((contact) =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
